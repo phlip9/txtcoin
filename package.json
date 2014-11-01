@@ -1,0 +1,30 @@
+{
+  "name": "bitsms",
+  "version": "0.0.1",
+  "description": "Bay Bithack Project",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.9.0",
+    "cors": "^2.4.2",
+    "express": "^4.9.5",
+    "mongoose": "^3.8.17"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phlip9/bitsms"
+  },
+  "keywords": [
+    "bitsms"
+  ],
+  "author": "Philip Hayes, Tak Li",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phlip9/bitsms/issues"
+  },
+  "homepage": "https://github.com/phlip9/bitsms"
+}
