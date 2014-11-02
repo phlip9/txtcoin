@@ -144,24 +144,29 @@ var getBalance = function (phone, callback) {
  */
 var makePaymentByAddress = function (phone, target_address, amount, callback) {
   // TODO: Modify this function
-  getAccount(phone, function (account) {
-    url = "https://blockchain.info/merchant/";
-    url += account.guid + "/payment?password=" + account.password;
-    url += "&to=" + target_address + "&amount=" + amount;
-    console.log("[Model] Fetching %s", url);
+  getAccount(phone, function (account, error) {
+    if (error) {
+      console.error(error);
+      callback(null, error)
+    } else {
+      url = "https://blockchain.info/merchant/";
+      url += account.guid + "/payment?password=" + account.password;
+      url += "&to=" + target_address + "&amount=" + amount;
+      console.log("[Model] Fetching %s", url);
 
-    request.post(url, function (err, httpResponse, message) {
-      if (err) {
-        console.error(err);
-      } else {
-        message = JSON.parse(message);
-        console.log("[Model] Payment successful:")
-        console.log(JSON.stringify(message));
-        if (callback) {
-          callback();
+      request.post(url, function (err, httpResponse, message) {
+        if (err) {
+          console.error(err);
+        } else {
+          message = JSON.parse(message);
+          console.log("[Model] Payment successful:")
+          console.log(JSON.stringify(message));
+          if (callback) {
+            callback();
+          }
         }
-      }
-    });
+      });
+    }
   });
 };
 
@@ -175,25 +180,31 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
  * @param callback {function} a callback function
  */
 var makePaymentByPhone = function (phone, target_phone, amount, callback) {
-  getAccount(phone, function(account) {
-    getAccount(target_phone, function(target_account) {
-      url = "https://blockchain.info/merchant/";
-      url += account.guid + "/payment?password=" + account.password;
-      url += "&to=" + target_account.address + "&amount=" + amount;
-      console.log("[Model] Fetching %s", url);
+  getAccount(phone, function(account, error1) {
+    getAccount(target_phone, function(target_account, error2) {
+      if (!(error1 or error2)) {
+        url = "https://blockchain.info/merchant/";
+        url += account.guid + "/payment?password=" + account.password;
+        url += "&to=" + target_account.address + "&amount=" + amount;
+        console.log("[Model] Fetching %s", url);
 
-      request.post(url, function (err, httpResponse, message) {
-        if (err) {
-          console.error(err);
-        } else {
-          message = JSON.parse(message);
-          console.log("[Model] Payment successful:");
-          console.log(JSON.stringify(message));
-          if (callback) {
-            callback(target_account.phone);
+        request.post(url, function (err, httpResponse, message) {
+          if (err) {
+            console.error(err);
+          } else {
+            message = JSON.parse(message);
+            console.log("[Model] Payment successful:");
+            console.log(JSON.stringify(message));
+            if (callback) {
+              callback(target_account.phone);
+            }
           }
-        }
-      });
+        });
+      } else {
+        var res = "Error: Your Account or the Target Account does not exist";
+        console.error(res);
+        callback(null, res);
+      }
     });
   });
 };

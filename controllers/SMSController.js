@@ -74,7 +74,7 @@ var commands = {
    */
   commands: function (sender, args) {
     var res = "Commands: help [command] | create_account | ";
-    res += "balance | send | request | qrcode";
+    res += "balance | send | request | qrcode | transactions | address";
     send_sms(sender, res);
   },
   /**
@@ -101,6 +101,15 @@ var commands = {
         res = "Command \'request\' request [amount] [BTC/mBTC/cBTC] to ";
         res += "[Phone Number]";
         break;
+      case "transactions":
+        res = "Command \'transactions\' will print the most recent 3 ";
+        res += "history transactions";
+        break;
+      case "address":
+        res = "Command \'address\' will print out your BTC address";
+      case "qrcode":
+        res = "Command \'qrcode\' will send you back the QR code image of ";
+        res += "your BTC address";
     }
     console.log(res);
     send_sms(sender, res);
@@ -152,10 +161,14 @@ var commands = {
 
     var satoshis = convert_to_satoshi(unit, amount);
 
-    var cb = function (receiver) {
-      send_sms(sender, 'Payment sent successfully!');
-      if (receiver) {
-        send_sms(receiver, sender + ' sent you ' + amount + ' BTC!');
+    var cb = function (receiver, error) {
+      if (error) {
+        send_sms(sender, error);
+      } else {
+        send_sms(sender, 'Payment sent successfully!');
+        if (receiver) {
+          send_sms(receiver, sender + ' sent you ' + amount + ' BTC!');
+        }
       }
     };
 
@@ -173,10 +186,14 @@ var commands = {
    *     qrcode
    */
   qrcode: function (sender, args) {
-    blockchain.getAccount(sender, function (account) {
-      var qrcode_url = account.qrurl;
-      console.log('QR Code url for', sender, ':', qrcode_url);
-      send_mms(sender, '', qrcode_url);
+    blockchain.getAccount(sender, function (account, error) {
+      if (error) {
+        send_sms(sender, error);
+      } else {
+        var qrcode_url = account.qrurl;
+        console.log('QR Code url for', sender, ':', qrcode_url);
+        send_mms(sender, qrcode_url, qrcode_url);
+      }
     });
   },
 
@@ -186,9 +203,9 @@ var commands = {
    *     regen_qrcode
    */
   regen_qrcode: function (sender, args) {
-    blockchain.regenQRCode(sender, function (url) {
-      console.log("QR Code updated! %s", url);
-      send_mms(sender, "QR Code updated!", url);
+    blockchain.regenQRCode(sender, function (qrcode_url) {
+      console.log("QR Code updated! %s", qrcode_url);
+      send_mms(sender, qrcode_url, qrcode_url);
     });
   },
 
@@ -202,9 +219,13 @@ var commands = {
     var unit = args[1];
     var provider = args[3];
 
-    blockchain.getAccount(provider, function(account) {
-      var res = sender + ' requested you to send him ' + amount + ' BTC';
-      send_sms(provider, res);
+    blockchain.getAccount(provider, function(account, error) {
+      if (error) {
+        send_sms(sender, 'Error: Requested account does not exist');
+      } else {
+        var res = sender + ' requested you to send him ' + amount + ' BTC';
+        send_sms(provider, res);
+      }
     });
   },
 
@@ -216,7 +237,8 @@ var commands = {
   transactions: function (sender, args) {
     blockchain.getAccount(sender, function (account, error) {
       if (error) {
-
+        console.error(error);
+        send_sms(sender, error);
       } else {
         transactions.getTransactions(account.address, function (data) {
           console.log(JSON.stringify(data));
@@ -229,8 +251,9 @@ var commands = {
                 return 'Received ' + txn.amount + ' BTC';
               }
             })
-            .forEach(function (txn) {
-              send_sms(sender, txn);
+            .forEach(function (txn, index, txns) {
+              var counter = txns.length - index;
+              send_sms(sender, '[' + counter + '] ' + txn);
             });
 
         });
