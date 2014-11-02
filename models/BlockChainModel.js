@@ -8,7 +8,7 @@ var accountSchema = mongoose.Schema({
   guid: String,
   address: String,
   password: String,
-  phone: Stringgit
+  phone: String
 });
 
 var accountModel = mongoose.model("accounts", accountSchema);
@@ -19,7 +19,7 @@ var accountModel = mongoose.model("accounts", accountSchema);
  * Query the database for the account with phone number
  * and give back the account object by invoking the callback
  *
- * @param phone {schartring} the phone number
+ * @param phone {string} the phone number
  * @param callback {function} a callback function with 1 parameter
  */
 var getAccount = function(phone, callback) {
