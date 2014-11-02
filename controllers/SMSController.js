@@ -255,14 +255,15 @@ var commands = {
           lodash(data)
             .first(3)
             .map(function (txn) {
+              var result = '[' + txn.timestamp + '] ';
               if (txn.type === 'send') {
-                return 'Sent ' + txn.amount + ' BTC (including fee)';
+                return result + 'Sent ' + txn.amount + ' BTC (including fee)';
               } else if (txn.type === 'receive') {
-                return 'Received ' + txn.amount + ' BTC';
+                return result + 'Received ' + txn.amount + ' BTC';
               }
             })
             .forEach(function (txn) {
-              send_sms(sender, '[' + txn.timestamp + '] ' + txn);
+              send_sms(sender, txn);
             });
         });
       }
