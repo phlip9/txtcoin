@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var request = require("request");
 var rpg = require("rpg");
+var upload_qr = require("../upload_qr");
 var API_CODE = "8a1efaba-63bf-43f6-bd3e-e8ce934c6ef6";
 
 // Schema and Model
@@ -8,7 +9,8 @@ var accountSchema = mongoose.Schema({
   guid: String,
   address: String,
   password: String,
-  phone: String
+  phone: String,
+  qrurl: String
 });
 
 var accountModel = mongoose.model("accounts", accountSchema);
@@ -78,21 +80,24 @@ var createWallet = function (phone, callback) {
           console.log(body);
 
           // save the account in the database
-          accountModel.create({
-            guid: body.guid,
-            address: body.address,
-            password: password,
-            phone: phone
-          }, function (err, account) {
-            if (err) {
-              console.error(err);
-            } else {
-              console.log("[MongoDB] Account is saved:");
-              console.log(JSON.stringify(account));
-              if (callback) {
-                callback(account);
+          upload_qr(body.address, function (url) {
+            accountModel.create({
+              guid: body.guid,
+              address: body.address,
+              password: password,
+              phone: phone,
+              qrurl: url
+            }, function (err, account) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log("[MongoDB] Account is saved:");
+                console.log(JSON.stringify(account));
+                if (callback) {
+                  callback(account);
+                }
               }
-            }
+            });
           });
         }
       });
