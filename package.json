@@ -17,8 +17,8 @@
     "sinon": "^1.11.1"
   },
   "scripts": {
-    "test": "mocha test",
-    "tdd": "mocha test --watch",
+    "test": "mocha test --recursive",
+    "tdd": "mocha test --recursive --watch --ui tdd",
     "start": "node server.js"
   },
   "repository": {
