@@ -28,8 +28,11 @@ node_modules
 .lock-wscript
 
 
-# Testing Files
-test.js
+# Backup Files
+ignore
 
 # vim
 .*.swp
+
+# Webstorm Files
+.idea
