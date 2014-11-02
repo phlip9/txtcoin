@@ -55,13 +55,17 @@ var commands = {
    */
   create_account: function (sender, args) {
     try {
-      blockchain.createWallet(sender);
+      blockchain.createWallet(sender, function (account) {
+        send_sms(sender, 'Created new account! BTC Address: ' + account.address);
+      });
     } catch (e) {
       console.error(e);
 
       if (e instanceof blockchain.AccountExistsError) {
         send_sms(sender, 'Error: Account already exists!');
       }
+
+      send_sms(sender, 'Error: ' + e.message);
     }
   },
 
@@ -88,10 +92,14 @@ var commands = {
     
     amount = convert_to_satoshi(unit, amount);
 
+    var cb = function () {
+      send_sms(sender, 'Payment sent successfully!');
+    };
+
     if (receiver.match(btc_regex)) {
-      blockchain.makePaymentByAddress(sender, receiver, amount);
+      blockchain.makePaymentByAddress(sender, receiver, amount, cb);
     } else { // assume phone number
-      blockchain.makePaymentByPhone(sender, receiver, amount);
+      blockchain.makePaymentByPhone(sender, receiver, amount, cb);
     }
   },
 
