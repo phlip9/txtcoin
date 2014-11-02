@@ -1,7 +1,7 @@
 // required packages
 var express = require("express");
 var bodyParser = require("body-parser");
-var setupRoutes = require('./route');
+var setupRoutes = require('./route.js');
 var cors = require('cors');
 var mongoose = require('mongoose');
 

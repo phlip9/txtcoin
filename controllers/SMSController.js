@@ -1,5 +1,5 @@
 var client = require('twilio')('ACe7faf8ca4cbaa71c9862e4a73f93574b', '8c6edb56e262e61e1614d7d8b0561552');
-var model = require('../models/BlockChainModel.js');
+var blockchain = require('../models/BlockChainModel.js');
 
 /**
  * Send an sms message to a receiving phone number
@@ -12,6 +12,30 @@ var send_sms = function (recipient, message) {
     to: to,
     body: message
   });
+};
+
+var btc_regex = /[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/;
+
+/**
+ * Converts amount in some unit to satoshis (100000000 Satoshi = 1 BTC)
+ *
+ * @param {string} unit - The units to convert from (BTC, cBTC, mBTC, Bit, satoshi);
+ * @param {number} amount
+ */
+var convert_to_satoshi = function (unit, amount) {
+  unit = unit.toUpperCase();
+
+  if (unit === 'BTC') {
+   return ~~(amount * 100000000); 
+  } else if (unit === 'CBTC') {
+   return ~~(amount * 1000000); 
+  } else if (unit === 'MBTC') {
+   return ~~(amount * 100000); 
+  } else if (unit === 'BIT') {
+   return ~~(amount * 100); 
+  } else {
+   return ~~(amount); 
+  }
 };
 
 var commands = {
@@ -27,10 +51,18 @@ var commands = {
   /**
    * Creates a bitcoin wallet associated with a phone number
    *
-   *     create_account <password> [<address>]
+   *     create_account
    */
   create_account: function (sender, args) {
+    try {
+      blockchain.createWallet(sender);
+    } catch (e) {
+      console.error(e);
 
+      if (e instanceof blockchain.AccountExistsError) {
+        send_sms(sender, 'Error: Account already exists!');
+      }
+    }
   },
 
   /**
@@ -39,16 +71,28 @@ var commands = {
    *     balance
    */
   balance: function (sender, args) {
-
+    blockchain.getBalance(sender, function (balance) {
+      send_sms(sender, 'Current balance: ' + balance + 'BTC');
+    });
   },
 
   /**
    * Send bitcoins to a phone number / bitcoin address
    *
-   *     send <amount> <recipient>
+   *     send <amount> <units> <recipient>
    */
   send: function (sender, args) {
+    var amount = args[0];
+    var unit = args[1];
+    var receiver = args[2];
+    
+    amount = convert_to_satoshi(unit, amount);
 
+    if (receiver.match(btc_regex)) {
+      blockchain.makePaymentByAddress(sender, receiver, amount);
+    } else { // assume phone number
+      blockchain.makePaymentByPhone(sender, receiver, amount);
+    }
   },
 
   /**
@@ -110,8 +154,9 @@ var receive_sms = function (req, res) {
 };
 
 module.exports = {
-  'commands': commands,
-  'parse_message': parse_message,
-  'send_sms': send_sms,
-  'receive_sms': receive_sms
+  commands: commands,
+  parse_message: parse_message,
+  send_sms: send_sms,
+  receive_sms: receive_sms,
+  convert_to_satoshi: convert_to_satoshi,
 };

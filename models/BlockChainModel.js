@@ -15,6 +15,14 @@ var accountModel = mongoose.model("accounts", accountSchema);
 
 // export functions
 
+var AccountExistsError = function () {
+  this.name = 'AccountExistsError';
+  this.message = 'Account already exists';
+};
+
+AccountExistsError.prototype = new Error();
+AccountExistsError.prototype.constructor = AccountExistsError;
+
 /**
  * Query the database for the account with phone number
  * and give back the account object by invoking the callback
@@ -58,7 +66,7 @@ var createWallet = function(phone) {
     } else if (already_exist) {
       console.log("[MongoDB] Account already exists:");
       console.log(already_exist);
-      throw "Shit! Account already exists!";
+      throw new AccountExistsError();
     } else {
       // send the request to blockchain server
       request.post(url, function(err, httpResponse, body){
@@ -168,7 +176,7 @@ var makePaymentByPhone = function(phone, target_phone, amount) {
           console.log("[Model] Payment successful: %s", message);
         }
       });
-    })
+    });
   });
 };
 
@@ -177,5 +185,6 @@ module.exports = {
   createWallet: createWallet,
   getBalance: getBalance,
   makePaymentByAddress: makePaymentByAddress,
-  makePaymentByPhone: makePaymentByPhone
+  makePaymentByPhone: makePaymentByPhone,
+  AccountExistsError: AccountExistsError
 };
