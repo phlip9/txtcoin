@@ -68,7 +68,7 @@ var convert_to_satoshi = function (unit, amount) {
 
 var commands = {
   hello: function(sender, args) {
-    var res = "Hi there, welcome to TextCoin, try typing <commands> ";
+    var res = "Hi there, welcome to TxtCoin, try typing <commands> ";
     res += "or <help [command]> to get to know how to use TextCoin :)";
     send_sms(sender, res);
   },
@@ -129,7 +129,6 @@ var commands = {
     console.log(res);
     send_sms(sender, res);
   },
-
   /**
    * Creates a bitcoin wallet associated with a phone number
    *
@@ -145,7 +144,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Sends the user their current bitcoin wallet balance
    *
@@ -162,7 +160,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Send bitcoins to a phone number / bitcoin address
    *
@@ -194,7 +191,6 @@ var commands = {
       blockchain.makePaymentByPhone(sender, receiver, satoshis, cb);
     }
   },
-
   /**
    * Sends the user an MMS qr code image of the BTC address
    *
@@ -211,7 +207,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Regenerates the user's QR code
    *
@@ -223,7 +218,6 @@ var commands = {
       send_mms(sender, qrcode_url, qrcode_url);
     });
   },
-
   /**
    * Request bitcoins from a phone number
    *
@@ -244,7 +238,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Send the last 3 transactions to the user
    *
@@ -275,7 +268,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Send the user their bitcoin wallet
    *
