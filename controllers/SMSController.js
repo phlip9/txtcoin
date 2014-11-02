@@ -88,7 +88,8 @@ var commands = {
    */
   balance: function (sender, args) {
     blockchain.getBalance(sender, function (balance) {
-      send_sms(sender, 'Current balance: ' + balance + 'BTC');
+      balance = balance / 100000000;
+      send_sms(sender, 'Current balance:', balance, 'BTC');
     });
   },
 
