@@ -10,6 +10,7 @@ var lodash = require('lodash');
  * @param {string} message - The message to send
  */
 var send_sms = function (recipient, message) {
+  message = '[TxtCoin] ' + message;
   console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
   client.sendSms({
     from: '+14156912236',
@@ -26,6 +27,7 @@ var send_sms = function (recipient, message) {
 };
 
 var send_mms = function (recipient, message, media_url) {
+  message = '[TxtCoin] ' + message;
   console.log('[send_mms] Sending MMS: to:', recipient, ', message:', message, ', media url:', media_url);
   client.sendMms({
     from: '+14156912236',
@@ -86,30 +88,33 @@ var commands = {
     var res = "";
     switch(args[0]) {
       case "create_account":
-        res = "Command \'create_account\' will create a BTC wallet";
+        res = "Command <create_account> will create a BTC wallet";
         res += " and link that wallet with your phone number";
         break;
       case "send":
-        res = "Command \'send\' send [amount] [BTC/mBTC/cBTC] to ";
+        res = "Command <send> send [amount] [BTC/mBTC/cBTC] to ";
         res += "[Phone Number/BTC Address]";
         break;
       case "balance":
-        res = "Command \'balance\' will show you the balance of your ";
+        res = "Command <balance> will show you the balance of your ";
         res += "current BTC account"
         break;
       case "request":
-        res = "Command \'request\' request [amount] [BTC/mBTC/cBTC] to ";
+        res = "Command <request> request [amount] [BTC/mBTC/cBTC] from ";
         res += "[Phone Number]";
         break;
       case "transactions":
-        res = "Command \'transactions\' will print the most recent 3 ";
+        res = "Command <transactions> will print the most recent 3 ";
         res += "history transactions";
         break;
       case "address":
-        res = "Command \'address\' will print out your BTC address";
+        res = "Command <address> will print out your BTC address";
       case "qrcode":
-        res = "Command \'qrcode\' will send you back the QR code image of ";
+        res = "Command <qrcode> will send you back the QR code image of ";
         res += "your BTC address";
+      default:
+        res = "Error: <" + args[0] + "> is not a valid command, ";
+        res += "try typing <commands>";
     }
     console.log(res);
     send_sms(sender, res);
@@ -286,8 +291,8 @@ var parse_message = function (sender, message) {
     console.log('[parse_message]', command, args);
     command_fn(sender, args);
   } else {
-    var error = "Error: ' + command + ' is an invalid command, ";
-    error += "try typing \'commands\' or \'help [command]\'";
+    var error = "Error: <" + command + "> is not a valid command, ";
+    error += "try typing <commands> or <help [command]>\'";
     console.error(error);
     send_sms(sender, error);
   }
