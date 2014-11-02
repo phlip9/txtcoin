@@ -1,5 +1,5 @@
 var cloudinary = require('cloudinary');
-var qr = reqiure('qr-image');
+var qr = require('qr-image');
 
 var create_send_qr = function (btc_addr, callback) {
   var link = 'bitcoin://' + btc_addr + '?amount=0';

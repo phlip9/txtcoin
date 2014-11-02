@@ -22,8 +22,16 @@ var AccountExistsError = function () {
   this.message = 'Account already exists';
 };
 
-AccountExistsError.prototype = new Error();
+AccountExistsError.prototype = Object.create(Error.prototype);
 AccountExistsError.prototype.constructor = AccountExistsError;
+
+var NoAccountError = function () {
+  this.name = 'NoAccountError';
+  this.message = 'Account does not exist';
+};
+
+NoAccountError.prototype = Object.create(Error.prototype);
+NoAccountError.prototype.constructor = NoAccountError;
 
 /**
  * Query the database for the account with phone number
@@ -114,22 +122,26 @@ var createWallet = function (phone, callback) {
  */
 var getBalance = function (phone, callback) {
   getAccount(phone, function (account) {
-    var url = "https://blockchain.info/merchant/";
-    url += account.guid + "/balance?password=" + account.password;
-    console.log("[Model] Fetching %s", url);
+    if (account) {
+      var url = "https://blockchain.info/merchant/";
+      url += account.guid + "/balance?password=" + account.password;
+      console.log("[Model] Fetching %s", url);
 
-    request.get(url, function (err, httpResponse, balance) {
-      if (err) {
-        console.error(err);
-      } else {
-        balance = JSON.parse(balance);
-        console.log("[Model] Balance is found: %s", balance);
-        console.log(balance);
-        if (callback) {
-          callback(balance.balance);
+      request.get(url, function (err, httpResponse, balance) {
+        if (err) {
+          console.error(err);
+        } else {
+          balance = JSON.parse(balance);
+          console.log("[Model] Balance is found: %s", balance);
+          console.log(balance);
+          if (callback) {
+            callback(balance.balance);
+          }
         }
-      }
-    });
+      });
+    } else {
+      throw new NoAccountError();
+    }
   });
 };
 
@@ -204,5 +216,6 @@ module.exports = {
   getBalance: getBalance,
   makePaymentByAddress: makePaymentByAddress,
   makePaymentByPhone: makePaymentByPhone,
-  AccountExistsError: AccountExistsError
+  AccountExistsError: AccountExistsError,
+  NoAccountError: NoAccountError
 };

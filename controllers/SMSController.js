@@ -66,40 +66,46 @@ var convert_to_satoshi = function (unit, amount) {
 
 var commands = {
   /**
+   * Sends the user a list of all commands
+   *
+   *     commands
+   */
+  commands: function (sender, args) {
+    var res = "Commands: help [command] | create_account | ";
+    res += "balance | send [amount] [BTC/cBTC/mBTC] to [phone number] | ";
+    res += "request [amount] [BTC/cBTC/mBTC] from [phone number]";
+    send_sms(sender, res);
+  },
+  /**
    * Sends the user help on a given command
    *
    *     help <command>
    */
   help: function (sender, args) {
     var res = "";
-    if (args) {
-      switch(args[0]) {
-        case "create_account":
-          res = "Command \'create_account\' will create a BTC account";
-          res += " and link that account with your phone number";
-          break;
-        case "send":
-          res = "Command \'send\' will send the designated amount of BTC to ";
-          res += "the account associated with the phone number you specified ";
-          res += "or the BTC address, e.g.\nsend 0.05 BTC to +12345678901\n";
-          res += "send 0.05 BTC to 1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq";
-          break;
-        case "balance":
-          res = "Command \'balance\' will show you the balance of your ";
-          res += "current BTC account"
-          break;
-        case "request":
-          res = "Command \'request\' will ask the account holder who has ";
-          res += "the designated phone number to pay you the amount of ";
-          res += "BTC you specified, e.g.\n";
-          res += "request 0.1 BTC from +10987654321"
-          break;
-      }
-    } else {
-      res = "Commands:\nhelp [command]\ncreate_account\n";
-      res += "balance\nsend [amount] [BTC/cBTC/mBTC] to [phone number]\n";
-      res += "request [amount] [BTC/cBTC/mBTC] from [phone number]";
+    switch(args[0]) {
+      case "create_account":
+        res = "Command \'create_account\' will create a BTC wallet";
+        res += " and link that wallet with your phone number";
+        break;
+      case "send":
+        res = "Command \'send\' will send the designated amount of BTC to ";
+        res += "the account associated with the phone number you specified ";
+        res += "or the BTC address, e.g. \'send 0.05 BTC to +12345678901\'";
+        res += " \'send 0.05 BTC to 1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq\'";
+        break;
+      case "balance":
+        res = "Command \'balance\' will show you the balance of your ";
+        res += "current BTC account"
+        break;
+      case "request":
+        res = "Command \'request\' will ask the account holder who has ";
+        res += "the designated phone number to pay you the amount of ";
+        res += "BTC you specified, e.g.";
+        res += " \'request 0.1 BTC from +10987654321\'"
+        break;
     }
+    console.log(res);
     send_sms(sender, res);
   },
 
@@ -115,15 +121,7 @@ var commands = {
       });
     } catch (e) {
       console.error(e);
-
       var error = 'Error: ' + e.message;
-
-      if (e instanceof blockchain.AccountExistsError) {
-        error = 'Error: Account already exists!';
-        console.log(error);
-        send_sms(sender, error);
-      }
-
       send_sms(sender, error);
     }
   },
@@ -134,10 +132,16 @@ var commands = {
    *     balance
    */
   balance: function (sender, args) {
-    blockchain.getBalance(sender, function (balance) {
-      balance = balance / 100000000;
-      send_sms(sender, 'Current balance: ' + balance + ' BTC');
-    });
+    try {
+      blockchain.getBalance(sender, function (balance) {
+        balance = balance / 100000000;
+        send_sms(sender, 'Current balance: ' + balance + ' BTC');
+      });
+    } catch (e) {
+      console.error(e);
+      var error = 'Error: ' + e.message;
+      send_sms(sender, error);
+    }
   },
 
   /**
@@ -187,7 +191,16 @@ var commands = {
    *     request <amount> <phone number>
    */
   request: function (sender, args) {
-    //TODO
+    var amount = args[0];
+    var unit = args[1];
+    var provider = args[3];
+
+    amount = convert_to_satoshi(unit, amount);
+
+    blockchain.getAccount(provider, function(account) {
+      var res = sender + ' requested you to send him ' + amount + ' BTC';
+      send_mms(provider, res);
+    });
   },
 
   /**
@@ -218,8 +231,8 @@ var parse_message = function (sender, message) {
     console.log('[parse_message]', command, args);
     command_fn(sender, args);
   } else {
-    var error = 'Error: ' + command + ' is an invalid command\n';
-    error += 'Try Typing help or help [command]';
+    var error = 'Error: ' + command + ' is an invalid command, ';
+    error += 'try typing commands or help [command]';
     console.error(error);
     send_sms(sender, error);
   }
