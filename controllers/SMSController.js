@@ -67,6 +67,11 @@ var convert_to_satoshi = function (unit, amount) {
 };
 
 var commands = {
+  hello: function(sender, args) {
+    var res = "Hi there, welcome to TextCoin, try typing <commands> ";
+    res += "or <help [command]> to get to know how to use TextCoin :)";
+    send_sms(sender, res);
+  },
   /**
    * Sends the user a list of all commands
    *
