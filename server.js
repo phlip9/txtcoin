@@ -14,7 +14,7 @@ setupRoutes(app);
 
 //Server Listening to Port
 var server = app.listen((process.env.PORT || 5000), function(){
-    console.log("server is running at %s", server.address().port);
+    console.log("[Server] Listening at %s", server.address().port);
 });
 
 module.exports = app;
