@@ -53,12 +53,12 @@ var commands = {
    *     help <command>
    */
   help: function (sender, args) {
-    if (args) {
-
-    } else {
-      var res = "Commands: help [command] create_account"
-      send_sms(sender, );
-    }
+    // if (args) {
+    //
+    // } else {
+    //   var res = "Commands: help [command] create_account"
+    //   send_sms(sender, );
+    // }
   },
 
   /**
