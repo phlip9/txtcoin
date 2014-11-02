@@ -158,11 +158,16 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
         if (err) {
           console.error(err);
         } else {
-          message = JSON.parse(message);
           console.log("[Model] Payment successful:")
-          console.log(JSON.stringify(message));
+          console.log(message);
+          message = JSON.parse(message);
+
           if (callback) {
-            callback();
+            if (message.error) {
+              callback(null, "Error: " + message.error);
+            } else {
+              callback();
+            }
           }
         }
       });
@@ -192,11 +197,15 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
           if (err) {
             console.error(err);
           } else {
-            message = JSON.parse(message);
             console.log("[Model] Payment successful:");
-            console.log(JSON.stringify(message));
+            console.log(message);
+            message = JSON.parse(message);
             if (callback) {
-              callback(target_account.phone);
+              if (message.error) {
+                callback(null, "Error: " + message.error);
+              } else {
+                callback(target_account.phone);
+              }
             }
           }
         });

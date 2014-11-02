@@ -222,7 +222,7 @@ var commands = {
   /**
    * Request bitcoins from a phone number
    *
-   *     request <amount> <phone number>
+   *     request <amount> <unit> <phone number>
    */
   request: function (sender, args) {
     var amount = args[0];
@@ -233,10 +233,9 @@ var commands = {
       if (error) {
         send_sms(sender, 'Error: Requested account does not exist');
       } else {
-        amount = convert_to_satoshi(amount, unit);
-        var res = sender + ' requested you to send him ' + amount + ' BTC';
+        var res = sender + ' requested you to send them ' + amount + ' ' + unit;
         send_sms(provider, res);
-        send_sms(sender, "Request sent, please wait for his/her response");
+        send_sms(sender, "Request sent, please wait for their response");
       }
     });
   },
