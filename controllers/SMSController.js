@@ -157,7 +157,7 @@ var commands = {
    *     request <amount> <phone number>
    */
   request: function (sender, args) {
-    //TODO
+    var amount = args[0];
   },
 
   /**
