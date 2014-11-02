@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 var request = require("request");
+var rpg = require("rpg");
 var API_CODE = "8a1efaba-63bf-43f6-bd3e-e8ce934c6ef6";
 
 // Schema and Model
@@ -37,10 +38,12 @@ var getAccount = function(phone, callback) {
  * Send a request to the BlockChain server to create a Wallet and
  * save the account information of the Wallet in the database
  *
- * @param password {string} the password
  * @param phone {string} the phone number
  */
-var createWallet = function(password, phone) {
+var createWallet = function(phone) {
+  // create password
+  var password = rpg({length: 16, set: 'lud'});
+
   // create url
   var url = "https://blockchain.info/api/v2/create_wallet";
   url += "?password=" + password;
@@ -107,15 +110,14 @@ var getBalance = function(phone, callback) {
  * to the account who has the target_address the amount of satoshi
  *
  * @param phone {string} the phone number
- * @param password {string} the password
  * @param target_address {string} the address of the target
  * @param amount {number} the amount of satoshi to pay
  */
-var makePaymentByAddress = function(phone, password, target_address, amount) {
+var makePaymentByAddress = function(phone, target_address, amount) {
   // TODO: Modify this function
   getAccount(phone, function(account) {
     url = "https://blockchain.info/merchant/";
-    url += account.guid + "/payment?password=" + password;
+    url += account.guid + "/payment?password=" + account.password;
     url += "&to=" + target_address + "&amount=" + amount;
     console.log("[Model] Fetching %s", url);
 
@@ -135,15 +137,14 @@ var makePaymentByAddress = function(phone, password, target_address, amount) {
  * to the account who has phone number target_phone the amount of satoshi
  *
  * @param phone {string} the phone number
- * @param password {string} the password
  * @param target_phone {string} the phone number of the target
  * @param amount {number} the amount of satoshi to pay
  */
-var makePaymentByPhone = function(phone, password, target_phone, amount) {
+var makePaymentByPhone = function(phone, target_phone, amount) {
   getAccount(phone, function(account) {
     getAccount(target_phone, function(target_account) {
       url = "https://blockchain.info/merchant/";
-      url += account.guid + "/payment?password=" + password;
+      url += account.guid + "/payment?password=" + account.password;
       url += "&to=" + target_account.address + "&amount=" + amount;
       console.log("[Model] Fetching %s", url);
 
