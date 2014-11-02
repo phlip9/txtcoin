@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
-var API_Code = "";
+var request = require("request");
+var API_CODE = "8a1efaba-63bf-43f6-bd3e-e8ce934c6ef6";
 
 // Schema and Model
 var accountSchema = mongoose.Schema({
@@ -11,34 +12,143 @@ var accountSchema = mongoose.Schema({
 
 var accountModel = mongoose.model("accounts", accountSchema);
 
-// Database Connection
-var connected = false;
-var connectToMongoDB = function(callback, obj, next) {
-    if (!connected) {
-        var path = process.env.MONGOHQ_URL + "/";
-//        var path = "mongodb://localhost/wepay";
-        console.log("Try Connecting %s", path);
-        mongoose.connect(path);
-        mongoose.connection.on("error", function() {
-            console.error.bind("[Model] Connection Failed: ");
-            connected = false;
-        });
-        mongoose.connection.once("open", function() {
-            console.log("[Model] Connection Success!!! PATH: %s", path);
-            connected = true;
-            if (callback) {
-                callback(obj, next);
-            } else {
-                console.error("[Model] No Callback Specified");
-            }
-        });
+// export functions
+
+/**
+ * Query the database for the account with phone number
+ * and give back the account object by invoking the callback
+ *
+ * @param phone {schartring} the phone number
+ * @param callback {function} a callback function with 1 parameter
+ */
+var getAccount = function(phone, callback) {
+  accountModel.findOne({phone: phone}, function(err, account) {
+    if (err) {
+      console.error(err);
+    } else {
+      if (callback) {
+        callback(account);
+      }
     }
+  });
 };
 
-var createWallet = function(password) {
+/**
+ * Send a request to the BlockChain server to create a Wallet and
+ * save the account information of the Wallet in the database
+ *
+ * @param password {string} the password
+ * @param phone {string} the phone number
+ */
+var createWallet = function(password, phone) {
+  // create url
+  var url = "https://blockchain.info/api/v2/create_wallet";
+  url += "?password=" + password;
+  url += "&api_code=" + API_CODE;
+  console.log("[Model] Fetching %s", url)
 
+  // send the request to blockchain server
+  request.post(url, function(err, httpResponse, body){
+    if (err) {
+      console.error(err);
+    } else {
+      console.log("[Model] Wallet is created:");
+      body = JSON.parse(body);
+      console.log(body);
+
+      //save the result to database
+      accountModel.create({
+        guid: body.guid,
+        address: body.address,
+        password: password,
+        phone: phone
+      }, function(err, account) {
+        if (err) {
+          console.error(err);
+        } else {
+          console.log("[MongoDB] Account is saved:");
+          console.log(account);
+        }
+      });
+    }
+  });
 };
+
+/**
+ * Send a request to the BlockChain server to get the balance
+ * and give it back by invoking the callback
+ *
+ * @param phone {string} the phone number
+ * @param callback {function} a callback function with 1 parameter
+ */
+var getBalance = function(phone, callback) {
+  getAccount(phone, function(account) {
+    var url = "https://blockchain.info/merchant/";
+    url += account.guid + "/balance?password=" + account.password;
+    console.log("[Model] Fetching %s", url);
+
+    request.get(url, function(err, httpResponse, balance) {
+      if (err) {
+        console.error(err);
+      } else {
+        balance = JSON.parse(balance);
+        console.log("[Model] Balance is found: %s", balance);
+        console.log(balance);
+        if (callback) {
+          callback(balance.balance);
+        }
+      }
+    });
+  });
+};
+
+/**
+ * Send a request to the BlockChain server to make a payment
+ * to the account who has the target_address the amount of satoshi
+ *
+ * @param phone {string} the phone number
+ * @param password {string} the password
+ * @param target_address {string} the address of the target
+ * @param amount {number} the amount of satoshi to pay
+ */
+var makePaymentByAddress = function(phone, password, target_address, amount) {
+  // TODO: Modify this function
+};
+
+/**
+ * Send a request to the BlockChain server to make a payment
+ * to the account who has phone number target_phone the amount of satoshi
+ *
+ * @param phone {string} the phone number
+ * @param password {string} the password
+ * @param target_phone {string} the phone number of the target
+ * @param amount {number} the amount of satoshi to pay
+ */
+var makePaymentByPhone = function(phone, password, target_phone, amount) {
+  getAccount(phone, function(account) {
+    getAccount(target_phone, function(target_account) {
+      url = "https://blockchain.info/merchant/";
+      url += account.guid + "/payment?password=" + password;
+      url += "&to=" + target_account.address + "&amount=" + amount;
+      console.log("[Model] Fetching %s", url);
+
+      request.post(url, function(err, httpResponse, message) {
+        if (err) {
+          console.error(err);
+        } else {
+          message = JSON.parse(message)
+          console.log("[Model] Payment successful: %s", message);
+        }
+      });
+    })
+  });
+};
+
 
 module.exports = {
-
+  getAccount: getAccount,
+  createWallet: createWallet,
+  getBalance: getBalance,
+  makePaymentByAddress: makePaymentByAddress,
+  makePaymentByPhone: makePaymentByPhone
 };
