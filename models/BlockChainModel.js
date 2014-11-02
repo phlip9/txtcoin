@@ -46,10 +46,10 @@ var getAccount = function(phone, callback) {
  * Send a request to the BlockChain server to create a Wallet and
  * save the account information of the Wallet in the database
  *
- *
  * @param phone {string} the phone number
+ * @param callback {function} a callback function
  */
-var createWallet = function(phone) {
+var createWallet = function(phone, callback) {
   // create password
   var password = rpg({length: 16, set: 'lud'});
 
@@ -89,6 +89,9 @@ var createWallet = function(phone) {
             } else {
               console.log("[MongoDB] Account is saved:");
               console.log(account);
+              if (callback) {
+                callback(account);
+              }
             }
           });
         }
@@ -132,8 +135,9 @@ var getBalance = function(phone, callback) {
  * @param phone {string} the phone number
  * @param target_address {string} the address of the target
  * @param amount {number} the amount of satoshi to pay
+ * @param callback {function} a callback function
  */
-var makePaymentByAddress = function(phone, target_address, amount) {
+var makePaymentByAddress = function(phone, target_address, amount, callback) {
   // TODO: Modify this function
   getAccount(phone, function(account) {
     url = "https://blockchain.info/merchant/";
@@ -146,7 +150,11 @@ var makePaymentByAddress = function(phone, target_address, amount) {
         console.error(err);
       } else {
         message = JSON.parse(message);
-        console.log("[Model] Payment successful: %s", message);
+        console.log("[Model] Payment successful:")
+        console.log(JSON.stringify(message));
+        if (callback) {
+          callback(message);
+        }
       }
     });
   });
@@ -159,8 +167,9 @@ var makePaymentByAddress = function(phone, target_address, amount) {
  * @param phone {string} the phone number
  * @param target_phone {string} the phone number of the target
  * @param amount {number} the amount of satoshi to pay
+ * @param callback {function} a callback function
  */
-var makePaymentByPhone = function(phone, target_phone, amount) {
+var makePaymentByPhone = function(phone, target_phone, amount, callback) {
   getAccount(phone, function(account) {
     getAccount(target_phone, function(target_account) {
       url = "https://blockchain.info/merchant/";
@@ -173,7 +182,11 @@ var makePaymentByPhone = function(phone, target_phone, amount) {
           console.error(err);
         } else {
           message = JSON.parse(message);
-          console.log("[Model] Payment successful: %s", message);
+          console.log("[Model] Payment successful:");
+          console.log(JSON.stringify(message));
+          if (callback) {
+            callback(message);
+          }
         }
       });
     });
