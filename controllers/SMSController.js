@@ -121,15 +121,7 @@ var commands = {
       });
     } catch (e) {
       console.error(e);
-
       var error = 'Error: ' + e.message;
-
-      if (e instanceof blockchain.AccountExistsError) {
-        error = 'Error: Account already exists!';
-        console.log(error);
-        send_sms(sender, error);
-      }
-
       send_sms(sender, error);
     }
   },
@@ -147,15 +139,7 @@ var commands = {
       });
     } catch (e) {
       console.error(e);
-
       var error = 'Error: ' + e.message;
-
-      if (e instanceof blockchain.NoAccountError) {
-        error = 'Error: Account does not exists!';
-        console.log(error);
-        send_sms(sender, error);
-      }
-
       send_sms(sender, error);
     }
   },
