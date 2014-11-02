@@ -153,7 +153,7 @@ var commands = {
     var unit = args[1];
     var receiver = args[3];
 
-    amount = convert_to_satoshi(unit, amount);
+    var satoshis = convert_to_satoshi(unit, amount);
 
     var cb = function (receiver) {
       send_sms(sender, 'Payment sent successfully!');
@@ -164,9 +164,9 @@ var commands = {
 
     console.log('Sending', amount, 'to', receiver, 'from', sender);
     if (receiver.match(btc_regex)) {
-      blockchain.makePaymentByAddress(sender, receiver, amount, cb);
+      blockchain.makePaymentByAddress(sender, receiver, satoshis, cb);
     } else { // assume phone number
-      blockchain.makePaymentByPhone(sender, receiver, amount, cb);
+      blockchain.makePaymentByPhone(sender, receiver, satoshis, cb);
     }
   },
 

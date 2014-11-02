@@ -194,6 +194,7 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
   });
 };
 
+/**/
 var regenQRCode = function (phone, callback) {
   getAccount(phone, function (account) {
     upload_qr(account.address, function (url) {
