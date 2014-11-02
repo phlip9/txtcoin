@@ -88,7 +88,7 @@ var createWallet = function (phone, callback) {
               console.error(err);
             } else {
               console.log("[MongoDB] Account is saved:");
-              console.log(account);
+              console.log(JSON.stringify(account));
               if (callback) {
                 callback(account);
               }
