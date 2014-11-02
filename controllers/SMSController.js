@@ -302,7 +302,7 @@ var parse_message = function (sender, message) {
     command_fn(sender, args);
   } else {
     var error = "Error: <" + command + "> is not a valid command, ";
-    error += "try typing <commands> or <help [command]>\'";
+    error += "try typing <commands> or <help [command]>";
     console.error(error);
     send_sms(sender, error);
   }
