@@ -30,7 +30,11 @@ var getAccount = function (phone, callback) {
       console.error(err);
     } else {
       if (callback) {
-        callback(account);
+        if (account) {
+          callback(account);
+        } else {
+          callback(null, "Error: Account does not exist")
+        }
       }
     }
   });

@@ -1,5 +1,7 @@
 var client = require('twilio')('ACe7faf8ca4cbaa71c9862e4a73f93574b', '8c6edb56e262e61e1614d7d8b0561552');
 var blockchain = require('../models/BlockChainModel.js');
+var transactions = require('../models/TransactionModel.js');
+var lodash = require('lodash');
 
 /**
  * Send an sms message to a receiving phone number
@@ -72,8 +74,7 @@ var commands = {
    */
   commands: function (sender, args) {
     var res = "Commands: help [command] | create_account | ";
-    res += "balance | send [amount] [BTC/cBTC/mBTC] to [phone number] | ";
-    res += "request [amount] [BTC/cBTC/mBTC] from [phone number]";
+    res += "balance | send | request | qrcode";
     send_sms(sender, res);
   },
   /**
@@ -89,20 +90,16 @@ var commands = {
         res += " and link that wallet with your phone number";
         break;
       case "send":
-        res = "Command \'send\' will send the designated amount of BTC to ";
-        res += "the account associated with the phone number you specified ";
-        res += "or the BTC address, e.g. \'send 0.05 BTC to +12345678901\'";
-        res += " \'send 0.05 BTC to 1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq\'";
+        res = "Command \'send\' send [amount] [BTC/mBTC/cBTC] to ";
+        res += "[Phone Number/BTC Address]";
         break;
       case "balance":
         res = "Command \'balance\' will show you the balance of your ";
         res += "current BTC account"
         break;
       case "request":
-        res = "Command \'request\' will ask the account holder who has ";
-        res += "the designated phone number to pay you the amount of ";
-        res += "BTC you specified, e.g.";
-        res += " \'request 0.1 BTC from +10987654321\'"
+        res = "Command \'request\' request [amount] [BTC/mBTC/cBTC] to ";
+        res += "[Phone Number]";
         break;
     }
     console.log(res);
@@ -217,7 +214,28 @@ var commands = {
    *     transactions
    */
   transactions: function (sender, args) {
+    blockchain.getAccount(sender, function (account, error) {
+      if (error) {
 
+      } else {
+        transactions.getTransactions(account.address, function (data) {
+          console.log(JSON.stringify(data));
+          lodash(data)
+            .first(3)
+            .map(function (txn) {
+              if (txn.type === 'send') {
+                return 'Sent ' + txn.amount + ' BTC [including fee]';
+              } else if (txn.type === 'receive') {
+                return 'Received ' + txn.amount + ' BTC';
+              }
+            })
+            .forEach(function (txn) {
+              send_sms(sender, txn);
+            });
+
+        });
+      }
+    });
   },
 
   /**
@@ -226,7 +244,13 @@ var commands = {
    *     address
    */
   address: function (sender, args) {
-
+    blockchain.getAccount(sender, function (account, error) {
+      if (error) {
+        send_sms(sender, error);
+      } else {
+        send_sms(sender, "Your BTC address: " + account.address);
+      }
+    });
   }
 };
 
@@ -239,8 +263,8 @@ var parse_message = function (sender, message) {
     console.log('[parse_message]', command, args);
     command_fn(sender, args);
   } else {
-    var error = 'Error: ' + command + ' is an invalid command, ';
-    error += 'try typing commands or help [command]';
+    var error = "Error: ' + command + ' is an invalid command, ";
+    error += "try typing \'commands\' or \'help [command]\'";
     console.error(error);
     send_sms(sender, error);
   }
