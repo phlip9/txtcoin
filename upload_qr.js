@@ -14,4 +14,4 @@ var create_send_qr = function (btc_addr, callback) {
   qr_png.pipe(upload_stream);
 };
 
-module.export = create_send_qr;
+module.exports = create_send_qr;
