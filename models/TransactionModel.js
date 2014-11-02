@@ -9,7 +9,8 @@ var simplifyTxns = function (txns) {
     if (txn.tx_input_n === -1 && txn.tx_output_n === 0) {
       return {
         type: 'receive',
-        amount: txn.value / 100000000
+        amount: txn.value / 100000000,
+        timestamp: txn.confirmed
       };
     } else {
       console.error('Error: Invalid Receive Transaction');
@@ -27,8 +28,9 @@ var simplifyTxns = function (txns) {
     if (change_txn && total_txn) {
       return {
         type: 'send',
-        amount: (total_txn.value - change_txn.value) / 100000000
-      }
+        amount: (total_txn.value - change_txn.value) / 100000000,
+        timestamp: txn.confirmed
+      };
     } else {
       console.error('Error: Invalid Send Transaction');
       return null;

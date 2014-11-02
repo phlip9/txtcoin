@@ -64,7 +64,7 @@ var createWallet = function (phone, callback) {
     } else if (already_exist) {
       console.log("[MongoDB] Account already exists:");
       console.log(already_exist);
-      callback(null, "Error: Account already exists");
+      callback(null, "Error: Account already exists!");
     } else {
       // send the request to blockchain server
       request.post(url, function (err, httpResponse, body){
@@ -128,7 +128,7 @@ var getBalance = function (phone, callback) {
         }
       });
     } else {
-      callback(null, "Error: Account does not exist")
+      callback(null, "Error: Account does not exist!")
     }
   });
 };
@@ -201,7 +201,7 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
           }
         });
       } else {
-        var res = "Error: Your Account or the Target Account does not exist";
+        var res = "Error: Your Account or the Target Account does not exist!";
         console.error(res);
         callback(null, res);
       }

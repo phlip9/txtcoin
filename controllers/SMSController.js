@@ -73,7 +73,7 @@ var commands = {
    *     commands
    */
   commands: function (sender, args) {
-    var res = "Commands: help [command] | create_account | ";
+    var res = "help [command] | create_account | ";
     res += "balance | send | request | qrcode | transactions | address";
     send_sms(sender, res);
   },
@@ -95,7 +95,7 @@ var commands = {
         break;
       case "balance":
         res = "Command <balance> will show you the balance of your ";
-        res += "current BTC account"
+        res += "current BTC wallet"
         break;
       case "request":
         res = "Command <request> request [amount] [BTC/mBTC/cBTC] from ";
@@ -261,11 +261,9 @@ var commands = {
                 return 'Received ' + txn.amount + ' BTC';
               }
             })
-            .forEach(function (txn, index, txns) {
-              var counter = txns.length - index;
-              send_sms(sender, '[' + counter + '] ' + txn);
+            .forEach(function (txn) {
+              send_sms(sender, '[' + txn.timestamp + '] ' + txn);
             });
-
         });
       }
     });
