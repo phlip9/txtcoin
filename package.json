@@ -10,9 +10,14 @@
     "mongoose": "^3.8.17",
     "twilio": "^1.7.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "mocha": "^2.0.1",
+    "sinon": "^1.11.1"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test",
+    "tdd": "mocha test --watch",
     "start": "node server.js"
   },
   "repository": {
