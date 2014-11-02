@@ -113,6 +113,21 @@ var getBalance = function(phone, callback) {
  */
 var makePaymentByAddress = function(phone, password, target_address, amount) {
   // TODO: Modify this function
+  getAccount(phone, function(account) {
+    url = "https://blockchain.info/merchant/";
+    url += account.guid + "/payment?password=" + password;
+    url += "&to=" + target_address + "&amount=" + amount;
+    console.log("[Model] Fetching %s", url);
+
+    request.post(url, function(err, httpResponse, message) {
+      if (err) {
+        console.error(err);
+      } else {
+        message = JSON.parse(message);
+        console.log("[Model] Payment successful: %s", message);
+      }
+    });
+  });
 };
 
 /**
@@ -143,7 +158,6 @@ var makePaymentByPhone = function(phone, password, target_phone, amount) {
     })
   });
 };
-
 
 module.exports = {
   getAccount: getAccount,
