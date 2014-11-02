@@ -8,8 +8,9 @@ var blockchain = require('../models/BlockChainModel.js');
  * @param {string} message - The message to send
  */
 var send_sms = function (recipient, message) {
+  console.log('Sending SMS: [ to:', recipient, ']', message);
   client.sendMessage({
-    to: to,
+    to: recipient,
     body: message
   });
 };
@@ -45,7 +46,7 @@ var commands = {
    *     help <command>
    */
   help: function (sender, args) {
-  
+    console.log('[help]', sender, args);
   },
 
   /**
@@ -54,6 +55,7 @@ var commands = {
    *     create_account
    */
   create_account: function (sender, args) {
+    console.log('[create_account]', sender, args);
     try {
       blockchain.createWallet(sender, function (account) {
         send_sms(sender, 'Created new account! BTC Address: ' + account.address);
@@ -61,11 +63,15 @@ var commands = {
     } catch (e) {
       console.error(e);
 
+      var error = 'Error: ' + e.message;
+
       if (e instanceof blockchain.AccountExistsError) {
-        send_sms(sender, 'Error: Account already exists!');
+        error = 'Error: Account already exists!';
+        console.log(error);
+        send_sms(sender, error);
       }
 
-      send_sms(sender, 'Error: ' + e.message);
+      send_sms(sender, error);
     }
   },
 
@@ -96,6 +102,7 @@ var commands = {
       send_sms(sender, 'Payment sent successfully!');
     };
 
+    console.log('Sending', amount, 'to', receiver, 'from', sender);
     if (receiver.match(btc_regex)) {
       blockchain.makePaymentByAddress(sender, receiver, amount, cb);
     } else { // assume phone number
@@ -136,9 +143,13 @@ var parse_message = function (sender, message) {
   var command = args[0];
   var command_fn = commands[command];
   if (command_fn) {
-    command_fn(sender, args.slice(1));
+    args = args.slice(1);
+    console.log('[parse_message] ' + command + '[' + args + ']');
+    command_fn(sender, args);
   } else {
-    send_sms(sender, 'Error: ' + command + ' is an invalid command');
+    var error = 'Error: ' + command + ' is an invalid command';
+    console.error(error);
+    send_sms(sender, error);
   }
 };
 
@@ -151,6 +162,7 @@ var parse_message = function (sender, message) {
 var receive_sms = function (req, res) {
   var body = req.body;
 
+  console.log('[receive_sms]');
   console.log(JSON.stringify(body));
 
   var sender = body.From;
