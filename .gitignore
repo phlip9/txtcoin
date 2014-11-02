@@ -33,3 +33,6 @@ test.js
 
 # vim
 .*.swp
+
+# Webstorm Files
+.idea

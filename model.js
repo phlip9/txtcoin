@@ -45,7 +45,7 @@ var createWallet = function(password, phone) {
   var url = "https://blockchain.info/api/v2/create_wallet";
   url += "?password=" + password;
   url += "&api_code=" + API_CODE;
-  console.log("[Model] Fetching %s", url)
+  console.log("[Model] Fetching %s", url);
 
   // send the request to blockchain server
   request.post(url, function(err, httpResponse, body){
@@ -136,7 +136,7 @@ var makePaymentByPhone = function(phone, password, target_phone, amount) {
         if (err) {
           console.error(err);
         } else {
-          message = JSON.parse(message)
+          message = JSON.parse(message);
           console.log("[Model] Payment successful: %s", message);
         }
       });
