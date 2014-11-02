@@ -194,6 +194,19 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
   });
 };
 
+var regenQRCode = function (phone, callback) {
+  getAccount(phone, function (account) {
+    upload_qr(account.address, function (url) {
+      accountModel.findOneAndUpdate({phone:phone}, {qrurl:url}, function (err, doc) {
+        console.log("[MongoDB] Updated: %s", JSON.stringify(doc));
+        if (callback) {
+          callback(url);
+        }
+      });
+    });
+  });
+};
+
 module.exports = {
   getAccount: getAccount,
   createWallet: createWallet,

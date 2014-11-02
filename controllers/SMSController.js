@@ -177,9 +177,21 @@ var commands = {
    */
   qrcode: function (sender, args) {
     blockchain.getAccount(sender, function (account) {
-      var qrcode_url = account.qrcode;
+      var qrcode_url = account.qrurl;
       console.log('QR Code url for', sender, ':', qrcode_url);
       send_mms(sender, '', qrcode_url);
+    });
+  },
+
+  /**
+   * Regenerates the user's QR code
+   *
+   *     regen_qrcode
+   */
+  regen_qrcode: function (sender, args) {
+    blockchain.regenQRCode(sender, function (url) {
+      console.log("QR Code updated! %s", url);
+      send_mms(sender, "QR Code updated!", url);
     });
   },
 
