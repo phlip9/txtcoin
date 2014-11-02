@@ -115,20 +115,14 @@ var commands = {
    *     create_account
    */
   create_account: function (sender, args) {
-    try {
-      blockchain.createWallet(sender, function (account) {
+    blockchain.createWallet(sender, function (account, error) {
+      if (!error) {
         send_sms(sender, 'Created new account! BTC Address: ' + account.address);
-      });
-    } catch (e) {
-      console.error(e);
-      var error = 'Error: ' + e.message;
-
-      if (e instanceof blockchain.AccountExistsError) {
-        error = 'Error: Account already exist';
+      } else {
+        console.error(error)
+        send_sms(sender, error);
       }
-
-      send_sms(sender, error);
-    }
+    });
   },
 
   /**
@@ -137,21 +131,15 @@ var commands = {
    *     balance
    */
   balance: function (sender, args) {
-    try {
-      blockchain.getBalance(sender, function (balance) {
+    blockchain.getBalance(sender, function (balance, error) {
+      if (!error) {
         balance = balance / 100000000;
         send_sms(sender, 'Current balance: ' + balance + ' BTC');
-      });
-    } catch (e) {
-      console.error(e);
-      var error = 'Error: ' + e.message;
-
-      if (e instanceof blockchain.NoAccountError) {
-        error = 'Error: Account does not exist';
+      } else {
+        console.log(error)
+        send_sms(sender, error)
       }
-
-      send_sms(sender, error);
-    }
+    });
   },
 
   /**
