@@ -30,8 +30,8 @@ AccountExistsError.prototype.constructor = AccountExistsError;
  * @param phone {string} the phone number
  * @param callback {function} a callback function with 1 parameter
  */
-var getAccount = function(phone, callback) {
-  accountModel.findOne({phone: phone}, function(err, account) {
+var getAccount = function (phone, callback) {
+  accountModel.findOne({phone: phone}, function (err, account) {
     if (err) {
       console.error(err);
     } else {
@@ -49,7 +49,7 @@ var getAccount = function(phone, callback) {
  * @param phone {string} the phone number
  * @param callback {function} a callback function
  */
-var createWallet = function(phone, callback) {
+var createWallet = function (phone, callback) {
   // create password
   var password = rpg({length: 16, set: 'lud'});
 
@@ -60,7 +60,7 @@ var createWallet = function(phone, callback) {
   console.log("[Model] Fetching %s", url);
 
   // check to see if account already exists
-  accountModel.findOne({phone: phone}, function(err, already_exist) {
+  accountModel.findOne({phone: phone}, function (err, already_exist) {
     if (err) {
       console.error(err);
     } else if (already_exist) {
@@ -69,7 +69,7 @@ var createWallet = function(phone, callback) {
       throw new AccountExistsError();
     } else {
       // send the request to blockchain server
-      request.post(url, function(err, httpResponse, body){
+      request.post(url, function (err, httpResponse, body){
         if (err) {
           console.error(err);
         } else {
@@ -83,7 +83,7 @@ var createWallet = function(phone, callback) {
             address: body.address,
             password: password,
             phone: phone
-          }, function(err, account) {
+          }, function (err, account) {
             if (err) {
               console.error(err);
             } else {
@@ -107,13 +107,13 @@ var createWallet = function(phone, callback) {
  * @param phone {string} the phone number
  * @param callback {function} a callback function with 1 parameter
  */
-var getBalance = function(phone, callback) {
-  getAccount(phone, function(account) {
+var getBalance = function (phone, callback) {
+  getAccount(phone, function (account) {
     var url = "https://blockchain.info/merchant/";
     url += account.guid + "/balance?password=" + account.password;
     console.log("[Model] Fetching %s", url);
 
-    request.get(url, function(err, httpResponse, balance) {
+    request.get(url, function (err, httpResponse, balance) {
       if (err) {
         console.error(err);
       } else {
@@ -137,15 +137,15 @@ var getBalance = function(phone, callback) {
  * @param amount {number} the amount of satoshi to pay
  * @param callback {function} a callback function
  */
-var makePaymentByAddress = function(phone, target_address, amount, callback) {
+var makePaymentByAddress = function (phone, target_address, amount, callback) {
   // TODO: Modify this function
-  getAccount(phone, function(account) {
+  getAccount(phone, function (account) {
     url = "https://blockchain.info/merchant/";
     url += account.guid + "/payment?password=" + account.password;
     url += "&to=" + target_address + "&amount=" + amount;
     console.log("[Model] Fetching %s", url);
 
-    request.post(url, function(err, httpResponse, message) {
+    request.post(url, function (err, httpResponse, message) {
       if (err) {
         console.error(err);
       } else {
@@ -169,7 +169,7 @@ var makePaymentByAddress = function(phone, target_address, amount, callback) {
  * @param amount {number} the amount of satoshi to pay
  * @param callback {function} a callback function
  */
-var makePaymentByPhone = function(phone, target_phone, amount, callback) {
+var makePaymentByPhone = function (phone, target_phone, amount, callback) {
   getAccount(phone, function(account) {
     getAccount(target_phone, function(target_account) {
       url = "https://blockchain.info/merchant/";
@@ -177,7 +177,7 @@ var makePaymentByPhone = function(phone, target_phone, amount, callback) {
       url += "&to=" + target_account.address + "&amount=" + amount;
       console.log("[Model] Fetching %s", url);
 
-      request.post(url, function(err, httpResponse, message) {
+      request.post(url, function (err, httpResponse, message) {
         if (err) {
           console.error(err);
         } else {

@@ -27,15 +27,15 @@ var convert_to_satoshi = function (unit, amount) {
   unit = unit.toUpperCase();
 
   if (unit === 'BTC') {
-   return ~~(amount * 100000000); 
+   return ~~(amount * 100000000);
   } else if (unit === 'CBTC') {
-   return ~~(amount * 1000000); 
+   return ~~(amount * 1000000);
   } else if (unit === 'MBTC') {
-   return ~~(amount * 100000); 
+   return ~~(amount * 100000);
   } else if (unit === 'BIT') {
-   return ~~(amount * 100); 
+   return ~~(amount * 100);
   } else {
-   return ~~(amount); 
+   return ~~(amount);
   }
 };
 
@@ -95,7 +95,7 @@ var commands = {
     var amount = args[0];
     var unit = args[1];
     var receiver = args[2];
-    
+
     amount = convert_to_satoshi(unit, amount);
 
     var cb = function () {
