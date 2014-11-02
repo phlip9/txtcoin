@@ -182,7 +182,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
 var makePaymentByPhone = function (phone, target_phone, amount, callback) {
   getAccount(phone, function(account, error1) {
     getAccount(target_phone, function(target_account, error2) {
-      if (!(error1 or error2)) {
+      if (!(error1 || error2)) {
         url = "https://blockchain.info/merchant/";
         url += account.guid + "/payment?password=" + account.password;
         url += "&to=" + target_account.address + "&amount=" + amount;
