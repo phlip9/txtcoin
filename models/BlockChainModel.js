@@ -60,17 +60,26 @@ var createWallet = function(phone) {
       console.log(body);
 
       //save the result to database
-      accountModel.create({
-        guid: body.guid,
-        address: body.address,
-        password: password,
-        phone: phone
-      }, function(err, account) {
+      accountModel.findOne({phone: phone}, function(err, already_exist) {
         if (err) {
           console.error(err);
+        } else if (already_exist) {
+          console.log("[MongoDB] Account already exists:");
+          console.log(already_exist);
         } else {
-          console.log("[MongoDB] Account is saved:");
-          console.log(account);
+          accountModel.create({
+            guid: body.guid,
+            address: body.address,
+            password: password,
+            phone: phone
+          }, function(err, account) {
+            if (err) {
+              console.error(err);
+            } else {
+              console.log("[MongoDB] Account is saved:");
+              console.log(account);
+            }
+          });
         }
       });
     }
