@@ -10,7 +10,6 @@ var lodash = require('lodash');
  * @param {string} message - The message to send
  */
 var send_sms = function (recipient, message) {
-  message = '[TxtCoin] ' + message;
   console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
   client.sendSms({
     from: '+14156912236',
@@ -27,7 +26,6 @@ var send_sms = function (recipient, message) {
 };
 
 var send_mms = function (recipient, message, media_url) {
-  message = '[TxtCoin] ' + message;
   console.log('[send_mms] Sending MMS: to:', recipient, ', message:', message, ', media url:', media_url);
   client.sendMms({
     from: '+14156912236',
@@ -109,12 +107,19 @@ var commands = {
         break;
       case "address":
         res = "Command <address> will print out your BTC address";
+        break;
       case "qrcode":
         res = "Command <qrcode> will send you back the QR code image of ";
         res += "your BTC address";
+        break;
+      case "help":
+        res = "Command <help [commands]> will display how these commands "
+        res += "should be sent with proper parameters"
+        break;
       default:
         res = "Error: <" + args[0] + "> is not a valid command, ";
         res += "try typing <commands>";
+        break;
     }
     console.log(res);
     send_sms(sender, res);
@@ -251,7 +256,7 @@ var commands = {
             .first(3)
             .map(function (txn) {
               if (txn.type === 'send') {
-                return 'Sent ' + txn.amount + ' BTC [including fee]';
+                return 'Sent ' + txn.amount + ' BTC (including fee)';
               } else if (txn.type === 'receive') {
                 return 'Received ' + txn.amount + ' BTC';
               }
