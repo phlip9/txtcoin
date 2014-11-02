@@ -1,5 +1,5 @@
 var client = require('twilio')('ACe7faf8ca4cbaa71c9862e4a73f93574b', '8c6edb56e262e61e1614d7d8b0561552');
-var model = require('../model.js');
+var model = require('../models/BlockChainModel.js');
 
 /**
  * Send an sms message to a receiving phone number

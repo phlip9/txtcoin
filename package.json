@@ -15,11 +15,12 @@
   "devDependencies": {
     "chai": "^1.9.2",
     "mocha": "^2.0.1",
+    "proxyquire": "^1.0.1",
     "sinon": "^1.11.1"
   },
   "scripts": {
     "test": "mocha test --recursive",
-    "tdd": "mocha test --recursive --watch --ui tdd",
+    "tdd": "mocha test --recursive --watch",
     "start": "node server.js"
   },
   "repository": {
