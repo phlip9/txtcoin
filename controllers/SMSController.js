@@ -10,6 +10,7 @@ var blockchain = require('../models/BlockChainModel.js');
 var send_sms = function (recipient, message) {
   console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
   client.sendMessage({
+    from: '+14156912236',
     to: recipient,
     body: message
   }, function (err, responseData) {
