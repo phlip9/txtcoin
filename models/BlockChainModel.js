@@ -81,7 +81,9 @@ var createWallet = function(phone, callback) {
             } else {
               console.log("[MongoDB] Account is saved:");
               console.log(account);
-              callback();
+              if (callback) {
+                callback(account);
+              }
             }
           });
         }
@@ -140,8 +142,11 @@ var makePaymentByAddress = function(phone, target_address, amount, callback) {
         console.error(err);
       } else {
         message = JSON.parse(message);
-        console.log("[Model] Payment successful: %s", message);
-        callback();
+        console.log("[Model] Payment successful:")
+        console.log(JSON.stringify(message));
+        if (callback) {
+          callback(message);
+        }
       }
     });
   });
@@ -169,8 +174,11 @@ var makePaymentByPhone = function(phone, target_phone, amount, callback) {
           console.error(err);
         } else {
           message = JSON.parse(message);
-          console.log("[Model] Payment successful: %s", message);
-          callback();
+          console.log("[Model] Payment successful:");
+          console.log(JSON.stringify(message));
+          if (callback) {
+            callback(message);
+          }
         }
       });
     })
