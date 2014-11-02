@@ -22,7 +22,7 @@ var AccountExistsError = function () {
   this.message = 'Account already exists';
 };
 
-AccountExistsError.prototype = new Error();
+AccountExistsError.prototype = Object.create(Error.prototype);
 AccountExistsError.prototype.constructor = AccountExistsError;
 
 var NoAccountError = function () {
@@ -30,7 +30,7 @@ var NoAccountError = function () {
   this.message = 'Account does not exist';
 };
 
-NoAccountError.prototype = new Error();
+NoAccountError.prototype = Object.create(Error.prototype);
 NoAccountError.prototype.constructor = NoAccountError;
 
 /**
