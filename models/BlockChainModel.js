@@ -199,7 +199,5 @@ module.exports = {
   createWallet: createWallet,
   getBalance: getBalance,
   makePaymentByAddress: makePaymentByAddress,
-  makePaymentByPhone: makePaymentByPhone,
-  AccountExistsError: AccountExistsError,
-  NoAccountError: NoAccountError
+  makePaymentByPhone: makePaymentByPhone
 };
