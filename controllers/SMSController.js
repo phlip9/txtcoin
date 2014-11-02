@@ -188,6 +188,15 @@ var commands = {
    */
   request: function (sender, args) {
     var amount = args[0];
+    var unit = args[1];
+    var provider = args[3];
+
+    amount = convert_to_satoshi(unit, amount);
+
+    blockchain.getAccount(provider, function(account) {
+      var res = sender + ' requested you to send him ' + amount + ' BTC';
+      send_mms(provider, res);
+    });
   },
 
   /**
