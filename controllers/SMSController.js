@@ -56,22 +56,28 @@ var commands = {
   help: function (sender, args) {
     var res = "";
     if (args) {
-
       switch(args[0]) {
         case "create_account":
-          res = "";
+          res = "Command \'create_account\' will create a BTC account";
+          res += " and link that account with your phone number";
           break;
         case "send":
-          res = "";
+          res = "Command \'send\' will send the designated amount of BTC to ";
+          res += "the account associated with the phone number you specified ";
+          res += "or the BTC address, e.g.\nsend 0.05 BTC to +12345678901\n";
+          res += "send 0.05 BTC to 1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq";
           break;
         case "balance":
-          res = "";
+          res = "Command \'balance\' will show you the balance of your ";
+          res += "current BTC account"
           break;
         case "request":
-          res = "";
+          res = "Command \'request\' will ask the account holder who has ";
+          res += "the designated phone number to pay you the amount of ";
+          res += "BTC you specified, e.g.\n";
+          res += "request 0.1 BTC from +10987654321"
           break;
       }
-
     } else {
       res = "Commands:\nhelp [command]\ncreate_account\n";
       res += "balance\nsend [amount] [BTC/cBTC/mBTC] to [phone number]\n";
@@ -130,8 +136,11 @@ var commands = {
 
     amount = convert_to_satoshi(unit, amount);
 
-    var cb = function () {
+    var cb = function (receiver) {
       send_sms(sender, 'Payment sent successfully!');
+      if (receiver) {
+        send_sms(receiver, sender + ' sent you ' + amount + ' BTC!');
+      }
     };
 
     console.log('Sending', amount, 'to', receiver, 'from', sender);
@@ -148,7 +157,7 @@ var commands = {
    *     request <amount> <phone number>
    */
   request: function (sender, args) {
-    // TODO
+    //TODO
   },
 
   /**
@@ -179,7 +188,8 @@ var parse_message = function (sender, message) {
     console.log('[parse_message]', command, args);
     command_fn(sender, args);
   } else {
-    var error = 'Error: ' + command + ' is an invalid command';
+    var error = 'Error: ' + command + ' is an invalid command\n';
+    error += 'Try Typing help or help [command]';
     console.error(error);
     send_sms(sender, error);
   }

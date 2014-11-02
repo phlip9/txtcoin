@@ -158,7 +158,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
         console.log("[Model] Payment successful:")
         console.log(JSON.stringify(message));
         if (callback) {
-          callback(message);
+          callback();
         }
       }
     });
@@ -190,7 +190,7 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
           console.log("[Model] Payment successful:");
           console.log(JSON.stringify(message));
           if (callback) {
-            callback(message);
+            callback(target_account.phone);
           }
         }
       });
