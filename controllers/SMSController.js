@@ -85,8 +85,8 @@ var commands = {
     var res = "";
     switch(args[0]) {
       case "create_account":
-        res = "Command \'create_account\' will create a BTC account";
-        res += " and link that account with your phone number";
+        res = "Command \'create_account\' will create a BTC wallet";
+        res += " and link that wallet with your phone number";
         break;
       case "send":
         res = "Command \'send\' will send the designated amount of BTC to ";
@@ -140,10 +140,24 @@ var commands = {
    *     balance
    */
   balance: function (sender, args) {
-    blockchain.getBalance(sender, function (balance) {
-      balance = balance / 100000000;
-      send_sms(sender, 'Current balance: ' + balance + ' BTC');
-    });
+    try {
+      blockchain.getBalance(sender, function (balance) {
+        balance = balance / 100000000;
+        send_sms(sender, 'Current balance: ' + balance + ' BTC');
+      });
+    } catch (e) {
+      console.error(e);
+
+      var error = 'Error: ' + e.message;
+
+      if (e instanceof blockchain.NoAccountError) {
+        error = 'Error: Account does not exists!';
+        console.log(error);
+        send_sms(sender, error);
+      }
+
+      send_sms(sender, error);
+    }
   },
 
   /**
@@ -234,7 +248,7 @@ var parse_message = function (sender, message) {
     command_fn(sender, args);
   } else {
     var error = 'Error: ' + command + ' is an invalid command, ';
-    error += 'try Typing commands or help [command]';
+    error += 'try typing commands or help [command]';
     console.error(error);
     send_sms(sender, error);
   }

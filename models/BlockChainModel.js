@@ -25,6 +25,14 @@ var AccountExistsError = function () {
 AccountExistsError.prototype = new Error();
 AccountExistsError.prototype.constructor = AccountExistsError;
 
+var NoAccountError = function () {
+  this.name = 'NoAccountError';
+  this.message = 'Account does not exist';
+};
+
+NoAccountError.prototype = new Error();
+NoAccountError.prototype.constructor = NoAccountError;
+
 /**
  * Query the database for the account with phone number
  * and give back the account object by invoking the callback
@@ -37,8 +45,12 @@ var getAccount = function (phone, callback) {
     if (err) {
       console.error(err);
     } else {
-      if (callback) {
-        callback(account);
+      if (account) {
+        if (callback) {
+          callback(account);
+        }
+      } else {
+        throw new NoAccountError();
       }
     }
   });
@@ -114,6 +126,7 @@ var createWallet = function (phone, callback) {
  */
 var getBalance = function (phone, callback) {
   getAccount(phone, function (account) {
+    // TODO: Error Handling
     var url = "https://blockchain.info/merchant/";
     url += account.guid + "/balance?password=" + account.password;
     console.log("[Model] Fetching %s", url);
@@ -204,5 +217,6 @@ module.exports = {
   getBalance: getBalance,
   makePaymentByAddress: makePaymentByAddress,
   makePaymentByPhone: makePaymentByPhone,
-  AccountExistsError: AccountExistsError
+  AccountExistsError: AccountExistsError,
+  NoAccountError: NoAccountError
 };
