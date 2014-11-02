@@ -233,8 +233,10 @@ var commands = {
       if (error) {
         send_sms(sender, 'Error: Requested account does not exist');
       } else {
+        amount = convert_to_satoshi(amount, unit);
         var res = sender + ' requested you to send him ' + amount + ' BTC';
         send_sms(provider, res);
+        send_sms(sender, "Request sent, please wait for his/her response");
       }
     });
   },
