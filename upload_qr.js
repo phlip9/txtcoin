@@ -7,7 +7,11 @@ var create_send_qr = function (btc_addr, callback) {
   var qr_png = qr.image(link, { type: 'png' });
   var upload_stream = cloudinary.uploader.upload_stream(function (res) {
     console.log('Finished uploading qr code', res.url);
-    callback(res.url);
+    if (callback) {
+      callback(res.url);
+    }
   });
   qr_png.pipe(upload_stream);
 };
+
+module.export = create_send_qr;
