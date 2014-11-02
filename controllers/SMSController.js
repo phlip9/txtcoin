@@ -104,7 +104,8 @@ var commands = {
         res += "BTC you specified, e.g.";
         res += " \'request 0.1 BTC from +10987654321\'"
         break;
-  console.log(res);
+    }
+    console.log(res);
     send_sms(sender, res);
   },
 
