@@ -29,7 +29,7 @@ var simplifyTxns = function (txns) {
       return {
         type: 'send',
         amount: (total_txn.value - change_txn.value) / 100000000,
-        timestamp: txn.confirmed
+        timestamp: total_txn.confirmed
       };
     } else {
       console.error('Error: Invalid Send Transaction');
