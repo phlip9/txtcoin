@@ -19,7 +19,7 @@ var accountModel = mongoose.model("accounts", accountSchema);
  * Query the database for the account with phone number
  * and give back the account object by invoking the callback
  *
- * @param phone {schartring} the phone number
+ * @param phone {string} the phone number
  * @param callback {function} a callback function with 1 parameter
  */
 var getAccount = function(phone, callback) {
@@ -38,6 +38,7 @@ var getAccount = function(phone, callback) {
  * Send a request to the BlockChain server to create a Wallet and
  * save the account information of the Wallet in the database
  *
+ *
  * @param phone {string} the phone number
  */
 var createWallet = function(phone) {
@@ -50,23 +51,25 @@ var createWallet = function(phone) {
   url += "&api_code=" + API_CODE;
   console.log("[Model] Fetching %s", url);
 
-  // send the request to blockchain server
-  request.post(url, function(err, httpResponse, body){
+  // check to see if account already exists
+  accountModel.findOne({phone: phone}, function(err, already_exist) {
     if (err) {
       console.error(err);
+    } else if (already_exist) {
+      console.log("[MongoDB] Account already exists:");
+      console.log(already_exist);
+      throw "Shit! Account already exists!";
     } else {
-      console.log("[Model] Wallet is created:");
-      body = JSON.parse(body);
-      console.log(body);
-
-      //save the result to database
-      accountModel.findOne({phone: phone}, function(err, already_exist) {
+      // send the request to blockchain server
+      request.post(url, function(err, httpResponse, body){
         if (err) {
           console.error(err);
-        } else if (already_exist) {
-          console.log("[MongoDB] Account already exists:");
-          console.log(already_exist);
         } else {
+          console.log("[Model] Wallet is created:");
+          body = JSON.parse(body);
+          console.log(body);
+
+          // save the account in the database
           accountModel.create({
             guid: body.guid,
             address: body.address,
