@@ -212,5 +212,6 @@ module.exports = {
   createWallet: createWallet,
   getBalance: getBalance,
   makePaymentByAddress: makePaymentByAddress,
-  makePaymentByPhone: makePaymentByPhone
+  makePaymentByPhone: makePaymentByPhone,
+  regenQRCode: regenQRCode
 };
