@@ -54,12 +54,30 @@ var commands = {
    *     help <command>
    */
   help: function (sender, args) {
-    // if (args) {
-    //
-    // } else {
-    //   var res = "Commands: help [command] create_account"
-    //   send_sms(sender, );
-    // }
+    var res = "";
+    if (args) {
+
+      switch(args[0]) {
+        case "create_account":
+          res = "";
+          break;
+        case "send":
+          res = "";
+          break;
+        case "balance":
+          res = "";
+          break;
+        case "request":
+          res = "";
+          break;
+      }
+
+    } else {
+      res = "Commands:\nhelp [command]\ncreate_account\n";
+      res += "balance\nsend [amount] [BTC/cBTC/mBTC] to [phone number]\n";
+      res += "request [amount] [BTC/cBTC/mBTC] from [phone number]";
+    }
+    send_sms(sender, res);
   },
 
   /**
@@ -105,9 +123,10 @@ var commands = {
    *     send <amount> <units> <recipient>
    */
   send: function (sender, args) {
+    // TODO: Error Handling
     var amount = args[0];
     var unit = args[1];
-    var receiver = args[2];
+    var receiver = args[3];
 
     amount = convert_to_satoshi(unit, amount);
 
@@ -129,7 +148,7 @@ var commands = {
    *     request <amount> <phone number>
    */
   request: function (sender, args) {
-
+    // TODO
   },
 
   /**
