@@ -8,10 +8,17 @@ var blockchain = require('../models/BlockChainModel.js');
  * @param {string} message - The message to send
  */
 var send_sms = function (recipient, message) {
-  console.log('Sending SMS: [ to:', recipient, ']', message);
+  console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
   client.sendMessage({
     to: recipient,
     body: message
+  }, function (err, responseData) {
+    if (!err) {
+      console.log('[send_sms] SMS message to', recipient, 'was successfully received');
+    } else {
+      console.error('[send_sms] Error sending SMS message to', recipient);
+      console.error('[send_sms] responseData:', JSON.stringify(responseData));
+    }
   });
 };
 
@@ -46,7 +53,7 @@ var commands = {
    *     help <command>
    */
   help: function (sender, args) {
-    console.log('[help]', sender, args);
+
   },
 
   /**
@@ -55,7 +62,6 @@ var commands = {
    *     create_account
    */
   create_account: function (sender, args) {
-    console.log('[create_account]', sender, args);
     try {
       blockchain.createWallet(sender, function (account) {
         send_sms(sender, 'Created new account! BTC Address: ' + account.address);
@@ -144,7 +150,7 @@ var parse_message = function (sender, message) {
   var command_fn = commands[command];
   if (command_fn) {
     args = args.slice(1);
-    console.log('[parse_message] ' + command + '[' + args + ']');
+    console.log('[parse_message]', command, args);
     command_fn(sender, args);
   } else {
     var error = 'Error: ' + command + ' is an invalid command';
