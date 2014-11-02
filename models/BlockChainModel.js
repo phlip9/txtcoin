@@ -164,7 +164,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
 
           if (callback) {
             if (message.error) {
-              callback(null, "Error: " + message.error);
+              callback(null, "Error: " + message.error + " (satoshi)");
             } else {
               callback();
             }
@@ -202,7 +202,7 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
             message = JSON.parse(message);
             if (callback) {
               if (message.error) {
-                callback(null, "Error: " + message.error);
+                callback(null, "Error: " + message.error + " (satoshi)");
               } else {
                 callback(target_account.phone);
               }
