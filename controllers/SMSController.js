@@ -79,6 +79,17 @@ var commands = {
   }
 };
 
+var parse_message = function (sender, message) {
+  var args = message.split(' ');
+  var command = args[0];
+  var command_fn = commands[command];
+  if (command_fn) {
+    command_fn(sender, args.slice(1));
+  } else {
+    send_sms(sender, 'Error: ' + command + ' is an invalid command');
+  }
+};
+
 /**
  * Called when a message is received.
  *
@@ -93,19 +104,14 @@ var receive_sms = function (req, res) {
   var sender = body.From;
   var message = body.Body;
 
-  var args = message.split(' ');
-  var command = args[0];
-  var command_fn = commands[command];
-  if (command_fn) {
-    command_fn(sender, args.slice(1));
-  } else {
-    send_sms(sender, 'Error: ' + command + ' is an invalid command');
-  }
+  parse_message(sender, message);
 
   res.end();
 };
 
 module.exports = {
+  'commands': commands,
+  'parse_message': parse_message,
   'send_sms': send_sms,
   'receive_sms': receive_sms
 };
