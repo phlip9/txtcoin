@@ -1,5 +1,5 @@
 {
-  "name": "bitsms",
+  "name": "txtcoin",
   "version": "0.0.1",
   "description": "Bay Bithack Project",
   "main": "server.js",
@@ -17,15 +17,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/phlip9/bitsms"
+    "url": "https://github.com/phlip9/txtcoin"
   },
   "keywords": [
-    "bitsms"
+    "txtcoin"
   ],
   "author": "Philip Hayes, Tak Li",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/phlip9/bitsms/issues"
+    "url": "https://github.com/phlip9/txtcoin/issues"
   },
-  "homepage": "https://github.com/phlip9/bitsms"
+  "homepage": "https://github.com/phlip9/txtcoin"
 }
