@@ -11,7 +11,7 @@ var create_send_qr = function (btc_addr, callback) {
       callback(res.url);
     }
   });
-  qr_png.pipe(upload_stream);
+  qr_png.on('data', upload_stream.write).on('end', upload_stream.end);
 };
 
 module.export = create_send_qr;
