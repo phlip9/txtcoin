@@ -9,7 +9,7 @@ var blockchain = require('../models/BlockChainModel.js');
  */
 var send_sms = function (recipient, message) {
   console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
-  client.sendMessage({
+  client.sendSms({
     from: '+14156912236',
     to: recipient,
     body: message
@@ -20,6 +20,23 @@ var send_sms = function (recipient, message) {
       console.error('[send_sms] Error sending SMS message to', recipient);
       console.error('[send_sms] responseData:', JSON.stringify(responseData));
     }
+  });
+};
+
+var send_mms = function (recipient, message, media_url) {
+  console.log('[send_mms] Sending MMS: to:', recipient, ', message:', message, ', media url:', media_url);
+  client.sendMms({
+    from: '+14156912236',
+    to: recipient,
+    body: message,
+    MediaUrl: media_url
+  }, function (err, responseData) {
+    if (!err) {
+      console.log('[send_mms] MMS message to', recipient, 'was successfully received');
+    } else {
+      console.error('[send_mms] Error sending MMS message to', recipient);
+    }
+    console.error('[send_mms] responseData:', JSON.stringify(responseData));
   });
 };
 
@@ -143,6 +160,19 @@ var commands = {
   },
 
   /**
+   * Sends the user an MMS qr code image of the BTC address
+   *
+   *     qrcode
+   */
+  qrcode: function (sender, args) {
+    blockchain.getAccount(sender, function (account) {
+      var qrcode_url = account.qrcode;
+      console.log('QR Code url for', sender, ':', qrcode_url);
+      send_mms(sender, '', qrcode_url);
+    });
+  },
+
+  /**
    * Request bitcoins from a phone number
    *
    *     request <amount> <phone number>
@@ -209,6 +239,7 @@ module.exports = {
   commands: commands,
   parse_message: parse_message,
   send_sms: send_sms,
+  send_mms: send_mms,
   receive_sms: receive_sms,
   convert_to_satoshi: convert_to_satoshi,
 };
