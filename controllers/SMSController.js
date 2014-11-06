@@ -10,7 +10,6 @@ var lodash = require('lodash');
  * @param {string} message - The message to send
  */
 var send_sms = function (recipient, message) {
-  message = '[TxtCoin] ' + message;
   console.log('[send_sms] Sending SMS: [ to:', recipient, ']', message);
   client.sendSms({
     from: '+14156912236',
@@ -27,7 +26,6 @@ var send_sms = function (recipient, message) {
 };
 
 var send_mms = function (recipient, message, media_url) {
-  message = '[TxtCoin] ' + message;
   console.log('[send_mms] Sending MMS: to:', recipient, ', message:', message, ', media url:', media_url);
   client.sendMms({
     from: '+14156912236',
@@ -69,13 +67,18 @@ var convert_to_satoshi = function (unit, amount) {
 };
 
 var commands = {
+  hello: function(sender, args) {
+    var res = "Hi there, welcome to TxtCoin, try typing <commands> ";
+    res += "or <help [command]> to get to know how to use TextCoin :)";
+    send_sms(sender, res);
+  },
   /**
    * Sends the user a list of all commands
    *
    *     commands
    */
   commands: function (sender, args) {
-    var res = "Commands: help [command] | create_account | ";
+    var res = "help [command] | create_account | ";
     res += "balance | send | request | qrcode | transactions | address";
     send_sms(sender, res);
   },
@@ -97,7 +100,7 @@ var commands = {
         break;
       case "balance":
         res = "Command <balance> will show you the balance of your ";
-        res += "current BTC account"
+        res += "current BTC wallet"
         break;
       case "request":
         res = "Command <request> request [amount] [BTC/mBTC/cBTC] from ";
@@ -109,17 +112,23 @@ var commands = {
         break;
       case "address":
         res = "Command <address> will print out your BTC address";
+        break;
       case "qrcode":
         res = "Command <qrcode> will send you back the QR code image of ";
         res += "your BTC address";
+        break;
+      case "help":
+        res = "Command <help [commands]> will display how these commands "
+        res += "should be sent with proper parameters"
+        break;
       default:
         res = "Error: <" + args[0] + "> is not a valid command, ";
         res += "try typing <commands>";
+        break;
     }
     console.log(res);
     send_sms(sender, res);
   },
-
   /**
    * Creates a bitcoin wallet associated with a phone number
    *
@@ -135,7 +144,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Sends the user their current bitcoin wallet balance
    *
@@ -152,7 +160,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Send bitcoins to a phone number / bitcoin address
    *
@@ -184,7 +191,6 @@ var commands = {
       blockchain.makePaymentByPhone(sender, receiver, satoshis, cb);
     }
   },
-
   /**
    * Sends the user an MMS qr code image of the BTC address
    *
@@ -201,7 +207,6 @@ var commands = {
       }
     });
   },
-
   /**
    * Regenerates the user's QR code
    *
@@ -213,11 +218,10 @@ var commands = {
       send_mms(sender, qrcode_url, qrcode_url);
     });
   },
-
   /**
    * Request bitcoins from a phone number
    *
-   *     request <amount> <phone number>
+   *     request <amount> <unit> <phone number>
    */
   request: function (sender, args) {
     var amount = args[0];
@@ -228,12 +232,12 @@ var commands = {
       if (error) {
         send_sms(sender, 'Error: Requested account does not exist');
       } else {
-        var res = sender + ' requested you to send him ' + amount + ' BTC';
+        var res = sender + ' requested you to send them ' + amount + ' ' + unit;
         send_sms(provider, res);
+        send_sms(sender, "Request sent, please wait for their response");
       }
     });
   },
-
   /**
    * Send the last 3 transactions to the user
    *
@@ -250,22 +254,20 @@ var commands = {
           lodash(data)
             .first(3)
             .map(function (txn) {
+              var result = '[' + txn.timestamp + '] ';
               if (txn.type === 'send') {
-                return 'Sent ' + txn.amount + ' BTC [including fee]';
+                return result + 'Sent ' + txn.amount + ' BTC (including fee)';
               } else if (txn.type === 'receive') {
-                return 'Received ' + txn.amount + ' BTC';
+                return result + 'Received ' + txn.amount + ' BTC';
               }
             })
-            .forEach(function (txn, index, txns) {
-              var counter = txns.length - index;
-              send_sms(sender, '[' + counter + '] ' + txn);
+            .forEach(function (txn) {
+              send_sms(sender, txn);
             });
-
         });
       }
     });
   },
-
   /**
    * Send the user their bitcoin wallet
    *
@@ -292,7 +294,7 @@ var parse_message = function (sender, message) {
     command_fn(sender, args);
   } else {
     var error = "Error: <" + command + "> is not a valid command, ";
-    error += "try typing <commands> or <help [command]>\'";
+    error += "try typing <commands> or <help [command]>";
     console.error(error);
     send_sms(sender, error);
   }

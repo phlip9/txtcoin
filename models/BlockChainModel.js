@@ -64,7 +64,7 @@ var createWallet = function (phone, callback) {
     } else if (already_exist) {
       console.log("[MongoDB] Account already exists:");
       console.log(already_exist);
-      callback(null, "Error: Account already exists");
+      callback(null, "Error: Account already exists!");
     } else {
       // send the request to blockchain server
       request.post(url, function (err, httpResponse, body){
@@ -128,7 +128,7 @@ var getBalance = function (phone, callback) {
         }
       });
     } else {
-      callback(null, "Error: Account does not exist")
+      callback(null, "Error: Account does not exist!")
     }
   });
 };
@@ -158,11 +158,16 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
         if (err) {
           console.error(err);
         } else {
-          message = JSON.parse(message);
           console.log("[Model] Payment successful:")
-          console.log(JSON.stringify(message));
+          console.log(message);
+          message = JSON.parse(message);
+
           if (callback) {
-            callback();
+            if (message.error) {
+              callback(null, "Error: " + message.error + " (satoshi)");
+            } else {
+              callback();
+            }
           }
         }
       });
@@ -192,16 +197,20 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
           if (err) {
             console.error(err);
           } else {
-            message = JSON.parse(message);
             console.log("[Model] Payment successful:");
-            console.log(JSON.stringify(message));
+            console.log(message);
+            message = JSON.parse(message);
             if (callback) {
-              callback(target_account.phone);
+              if (message.error) {
+                callback(null, "Error: " + message.error + " (satoshi)");
+              } else {
+                callback(target_account.phone);
+              }
             }
           }
         });
       } else {
-        var res = "Error: Your Account or the Target Account does not exist";
+        var res = "Error: Your Account or the Target Account does not exist!";
         console.error(res);
         callback(null, res);
       }
