@@ -61,10 +61,10 @@ describe('TransactionModel', function () {
     it('should parse a simple send transaction', function (done) {
       stub_get(sampleData.send);
       var txns = getTransactions('foo', function (results) {
-        expect(results).to.eql([
-          { type: 'send', amount: 0.0008 }
-        ]);
         request.get.restore();
+        expect(results).to.eql([
+          { type: 'send', timestamp: "2014-11-02T23:01:09Z", amount: 0.0008 }
+        ]);
         done();
       });
     });
@@ -72,10 +72,10 @@ describe('TransactionModel', function () {
     it('should parse a simple receive transaction', function (done) {
       stub_get(sampleData.receive);
       var txns = getTransactions('foo', function (results) {
-        expect(results).to.eql([
-          { type: 'receive', amount: 0.001 }
-        ]);
         request.get.restore();
+        expect(results).to.eql([
+          { type: 'receive', timestamp: '2014-11-02T07:13:06Z', amount: 0.001 }
+        ]);
         done();
       });
     });
