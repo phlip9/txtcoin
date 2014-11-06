@@ -1,4 +1,4 @@
-var request = require("request");
+var request = require('request');
 var lodash = require('lodash');
 
 var simplifyTxns = function (txns) {
@@ -28,7 +28,7 @@ var simplifyTxns = function (txns) {
       return {
         type: 'send',
         amount: (total_txn.value - change_txn.value) / 100000000
-      }
+      };
     } else {
       console.error('Error: Invalid Send Transaction');
       return null;
@@ -36,7 +36,7 @@ var simplifyTxns = function (txns) {
   }
 };
 
-var parseTransactions = function (data) {
+var parseTxns = function (data) {
   return lodash(data)
     .groupBy('tx_hash')
     .mapValues(simplifyTxns)
@@ -53,7 +53,7 @@ var getTransactions = function(address, callback) {
     } else {
       console.log(body);
       body = JSON.parse(body);
-      callback(parseTransactions(body.txrefs));
+      callback(parseTxns(body.txrefs));
     }
   });
 };
