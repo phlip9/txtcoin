@@ -6,6 +6,10 @@ var blockchain = require('../models/BlockChainModel.js');
 var transactions = require('../models/TransactionModel.js');
 var lodash = require('lodash');
 
+var btc_utils = require('../btc_utils.js');
+var convert_to_satoshi = btc_utils.convert_to_satoshi;
+var matches_btc_str = btc_utils.matches_btc_str;
+
 /**
  * Send an sms message to a receiving phone number
  *
@@ -43,30 +47,6 @@ var send_mms = function (recipient, message, media_url) {
     }
     console.error('[send_mms] responseData:', JSON.stringify(responseData));
   });
-};
-
-var btc_regex = /[13][a-km-zA-HJ-NP-Z0-9]{26,33}$/;
-
-/**
- * Converts amount in some unit to satoshis (100000000 Satoshi = 1 BTC)
- *
- * @param {string} unit - The units to convert from (BTC, cBTC, mBTC, Bit, satoshi);
- * @param {number} amount
- */
-var convert_to_satoshi = function (unit, amount) {
-  unit = unit.toUpperCase();
-
-  if (unit === 'BTC') {
-   return Math.floor(amount * 100000000);
-  } else if (unit === 'CBTC') {
-   return Math.floor(amount * 1000000);
-  } else if (unit === 'MBTC') {
-   return Math.floor(amount * 100000);
-  } else if (unit === 'BIT') {
-   return Math.floor(amount * 100);
-  } else {
-   return Math.floor(amount);
-  }
 };
 
 var commands = {
@@ -188,7 +168,7 @@ var commands = {
     };
 
     console.log('Sending', amount, 'to', receiver, 'from', sender);
-    if (receiver.match(btc_regex)) {
+    if (matches_btc_str(receiver)) {
       blockchain.makePaymentByAddress(sender, receiver, satoshis, cb);
     } else { // assume phone number
       blockchain.makePaymentByPhone(sender, receiver, satoshis, cb);
@@ -328,6 +308,5 @@ module.exports = {
   parse_message: parse_message,
   send_sms: send_sms,
   send_mms: send_mms,
-  receive_sms: receive_sms,
-  convert_to_satoshi: convert_to_satoshi,
+  receive_sms: receive_sms
 };

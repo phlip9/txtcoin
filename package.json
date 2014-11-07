@@ -4,6 +4,7 @@
   "description": "Bay Bithack Project",
   "main": "server.js",
   "dependencies": {
+    "bitcoin-address": "^0.3.0",
     "body-parser": "^1.9.0",
     "cloudinary": "^1.0.12",
     "cors": "^2.4.2",
