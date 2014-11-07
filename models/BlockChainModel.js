@@ -1,19 +1,10 @@
-var mongoose = require("mongoose");
 var request = require("request");
 var rpg = require("rpg");
 var upload_qr = require("../upload_qr");
+var accountModel = require('./AccountModel.js');
+
+// TODO: Move out of code and into env variable.
 var API_CODE = "8a1efaba-63bf-43f6-bd3e-e8ce934c6ef6";
-
-// Schema and Model
-var accountSchema = mongoose.Schema({
-  guid: String,
-  address: String,
-  password: String,
-  phone: String,
-  qrurl: String
-});
-
-var accountModel = mongoose.model("accounts", accountSchema);
 
 // export functions
 
@@ -33,7 +24,7 @@ var getAccount = function (phone, callback) {
         if (account) {
           callback(account);
         } else {
-          callback(null, "Error: Account does not exist")
+          callback(null, "Error: Account does not exist");
         }
       }
     }
@@ -128,7 +119,7 @@ var getBalance = function (phone, callback) {
         }
       });
     } else {
-      callback(null, "Error: Account does not exist!")
+      callback(null, "Error: Account does not exist!");
     }
   });
 };
@@ -147,7 +138,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
   getAccount(phone, function (account, error) {
     if (error) {
       console.error(error);
-      callback(null, error)
+      callback(null, error);
     } else {
       url = "https://blockchain.info/merchant/";
       url += account.guid + "/payment?password=" + account.password;
@@ -158,7 +149,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
         if (err) {
           console.error(err);
         } else {
-          console.log("[Model] Payment successful:")
+          console.log("[Model] Payment successful:");
           console.log(message);
           message = JSON.parse(message);
 
