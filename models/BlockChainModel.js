@@ -1,3 +1,5 @@
+'use strict';
+
 var request = require("request");
 var rpg = require("rpg");
 var upload_qr = require("../upload_qr");
@@ -140,7 +142,7 @@ var makePaymentByAddress = function (phone, target_address, amount, callback) {
       console.error(error);
       callback(null, error);
     } else {
-      url = "https://blockchain.info/merchant/";
+      var url = "https://blockchain.info/merchant/";
       url += account.guid + "/payment?password=" + account.password;
       url += "&to=" + target_address + "&amount=" + amount;
       console.log("[Model] Fetching %s", url);
@@ -179,7 +181,7 @@ var makePaymentByPhone = function (phone, target_phone, amount, callback) {
   getAccount(phone, function(account, error1) {
     getAccount(target_phone, function(target_account, error2) {
       if (!(error1 || error2)) {
-        url = "https://blockchain.info/merchant/";
+        var url = "https://blockchain.info/merchant/";
         url += account.guid + "/payment?password=" + account.password;
         url += "&to=" + target_account.address + "&amount=" + amount;
         console.log("[Model] Fetching %s", url);

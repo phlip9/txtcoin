@@ -1,3 +1,6 @@
+'use strict';
+
+// TODO: Move from code to env variable
 var client = require('twilio')('ACe7faf8ca4cbaa71c9862e4a73f93574b', '8c6edb56e262e61e1614d7d8b0561552');
 var blockchain = require('../models/BlockChainModel.js');
 var transactions = require('../models/TransactionModel.js');
@@ -54,15 +57,15 @@ var convert_to_satoshi = function (unit, amount) {
   unit = unit.toUpperCase();
 
   if (unit === 'BTC') {
-   return ~~(amount * 100000000);
+   return Math.floor(amount * 100000000);
   } else if (unit === 'CBTC') {
-   return ~~(amount * 1000000);
+   return Math.floor(amount * 1000000);
   } else if (unit === 'MBTC') {
-   return ~~(amount * 100000);
+   return Math.floor(amount * 100000);
   } else if (unit === 'BIT') {
-   return ~~(amount * 100);
+   return Math.floor(amount * 100);
   } else {
-   return ~~(amount);
+   return Math.floor(amount);
   }
 };
 
@@ -100,7 +103,7 @@ var commands = {
         break;
       case "balance":
         res = "Command <balance> will show you the balance of your ";
-        res += "current BTC wallet"
+        res += "current BTC wallet";
         break;
       case "request":
         res = "Command <request> request [amount] [BTC/mBTC/cBTC] from ";
@@ -118,8 +121,8 @@ var commands = {
         res += "your BTC address";
         break;
       case "help":
-        res = "Command <help [commands]> will display how these commands "
-        res += "should be sent with proper parameters"
+        res = "Command <help [commands]> will display how these commands ";
+        res += "should be sent with proper parameters";
         break;
       default:
         res = "Error: <" + args[0] + "> is not a valid command, ";
@@ -139,7 +142,7 @@ var commands = {
       if (!error) {
         send_sms(sender, 'Created new account! BTC Address: ' + account.address);
       } else {
-        console.error(error)
+        console.error(error);
         send_sms(sender, error);
       }
     });
@@ -155,8 +158,8 @@ var commands = {
         balance = balance / 100000000;
         send_sms(sender, 'Current balance: ' + balance + ' BTC');
       } else {
-        console.log(error)
-        send_sms(sender, error)
+        console.log(error);
+        send_sms(sender, error);
       }
     });
   },
